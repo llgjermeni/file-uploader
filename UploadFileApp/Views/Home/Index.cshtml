@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+
+<div class="jumbotron">
+    <h2>Upload Files </h2>
+    <h5>With this asp.net you can upload files(images, pdf etc.) from the client and save them in another location over the internet.</h5>
+    
+    
+</div>
+
+
+@using (Html.BeginForm("UploadAsync", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="fileUpload btn btn-default">
+        <span>Select Files</span><input type="file" id="file" name="selectFiles" class="upload" onchange="DisplayFilesToUpload()" multiple />
+    </div>
+    
+    <p id="FilesToUpload"></p>
+}
+
+
+@if (Model != null && Model.Count > 0)
+{
+    foreach (var item in Model)
+    {
+        <div class="imageBlock">
+            <a href="@item" target="_blank"><img class="thumb" src="@item" alt="images" /></a><br />
+            <div class="deleteDiv"><img class="deleteIcon" src="~/Images/deleteImage.png" title="Delete Image" onclick="deleteImage('@item');" /></div>
+        </div>
+    }
+
+    using (Html.BeginForm("DeleteAll", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="fileUpload btn btn-default"><span>Delete All Files</span><input type="submit" name="deleteAll" class="upload" /></div>
+    }
+}
+<script>
+    
+    function deleteImage(item) {
+        var url = "/Home/DeleteImage";
+        $.post(url, { Name: item }, function (data) {
+            window.location.href = "/Home/Index";
+        });
+    }
+
+   
+    function DisplayFilesToUpload() {
+        var element = document.getElementById("file");
+        var html = "";
+
+        html = "<h3>Image(s) to Upload</h3>"
+        for (var i = 0; i < element.files.length; i++) {
+            html += "<strong>" + (i + 1) + "</strong>. File: ";
+            var file = element.files[i];
+            if ('name' in file) {html += file.name + " (";}
+            if ('size' in file) {html += "size: " + file.size + " bytes)<br>";}
+        }
+
+        html += "<div class='fileUpload btn btn-default'><span>Upload</span><input type='submit' class='upload' value='Upload'/></div>"
+        document.getElementById("FilesToUpload").innerHTML = html;
+    }
+
+</script>
